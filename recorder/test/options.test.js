@@ -7,6 +7,7 @@ test("normalizeOptions merges nested configuration without losing defaults", () 
   const options = normalizeOptions({
     position: "top-left",
     features: { microphone: false },
+    capture: { surfaceSwitching: "include" },
     labels: { trigger: "Help" },
     theme: { primaryColor: "#123456" }
   });
@@ -14,6 +15,8 @@ test("normalizeOptions merges nested configuration without losing defaults", () 
   assert.equal(options.position, "top-left");
   assert.equal(options.features.microphone, false);
   assert.equal(options.features.video, true);
+  assert.equal(options.capture.preferCurrentTab, true);
+  assert.equal(options.capture.surfaceSwitching, "include");
   assert.equal(options.labels.trigger, "Help");
   assert.equal(options.labels.submit, "Submit report");
   assert.equal(options.theme.primaryColor, "#123456");

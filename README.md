@@ -2,7 +2,7 @@
 
 Firsthand is a lightweight, embeddable reporting system that turns user-recorded evidence into developer-ready GitHub issues and supports controlled two-way communication.
 
-The project is at an early MVP stage. The recorder has an initial browser implementation; the transcoder and reporter remain at the boundary-definition stage.
+The recorder has a complete browser test implementation; the transcoder and reporter remain at the boundary-definition stage.
 
 ## Project structure
 

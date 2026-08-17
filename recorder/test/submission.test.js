@@ -12,10 +12,7 @@ function makeReport() {
       blob: new Blob(["video"], { type: "video/webm" }),
       fileName: "recording.webm"
     },
-    snapshots: [{
-      blob: new Blob(["image"], { type: "image/png" }),
-      fileName: "snapshot.png"
-    }]
+    prepared: { title: "Save button does not respond" }
   };
 }
 
@@ -27,7 +24,9 @@ test("buildFormData uses the documented multipart field names", () => {
     pageUrl: "https://example.test/settings"
   });
   assert.equal(formData.get("video").name, "recording.webm");
-  assert.equal(formData.getAll("snapshots")[0].name, "snapshot.png");
+  assert.deepEqual(JSON.parse(formData.get("prepared")), {
+    title: "Save button does not respond"
+  });
 });
 
 test("submitReport posts multipart data and returns the parsed response", async () => {

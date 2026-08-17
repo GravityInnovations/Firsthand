@@ -5,7 +5,13 @@ import path from "node:path";
 const recorderRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sourceDirectory = path.join(recorderRoot, "src");
 const outputDirectory = path.join(recorderRoot, "dist");
-const moduleNames = ["options.js", "submission.js", "media-capture.js", "index.js"];
+const moduleNames = [
+  "options.js",
+  "submission.js",
+  "preparation.js",
+  "media-capture.js",
+  "index.js"
+];
 
 function convertModuleToClassicScript(source) {
   return source
@@ -27,12 +33,14 @@ ${sources.map(convertModuleToClassicScript).join("\n")}
 
   global.FirsthandRecorder = Object.freeze({
     FirsthandRecorder,
+    PreparationError,
     SubmissionError,
     buildFormData,
     collectBrowserMetadata,
     createRecorder,
     DEFAULT_OPTIONS,
     normalizeOptions,
+    prepareReport,
     registerJQueryPlugin,
     submitReport
   });

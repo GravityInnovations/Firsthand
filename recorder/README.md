@@ -1,6 +1,6 @@
 # Firsthand Recorder
 
-Firsthand Recorder is a lightweight, framework-neutral browser widget for collecting a problem description, screen recording, microphone narration, and screen snapshots.
+Firsthand Recorder is a lightweight, framework-neutral browser widget for collecting a problem description and a narrated screen recording.
 
 It is independent of any particular backend. The host application supplies a submission endpoint and handles the response through callbacks or DOM events.
 
@@ -11,7 +11,7 @@ It is independent of any particular backend. The host application supplies a sub
 - An optional jQuery plugin adapter
 - Fixed placement in any corner or inline placement inside an existing element
 
-Screen recording and snapshots require a secure browser context (`https://` or `localhost`) and explicit user permission.
+Screen recording requires a secure browser context (`https://` or `localhost`) and explicit user permission.
 
 ## Build locally
 
@@ -154,19 +154,27 @@ createRecorder({
   className: "my-recorder",
   closeOnSuccess: false,
   maxRecordingMs: 120000,
-  maxSnapshots: 5,
 
   features: {
     video: true,
-    snapshot: true,
     description: true,
     microphone: true,
     systemAudio: true
   },
 
+  capture: {
+    preferCurrentTab: true,
+    displaySurface: "browser",
+    selfBrowserSurface: "include",
+    surfaceSwitching: "exclude",
+    systemAudio: "include",
+    windowAudio: "system"
+  },
+
   labels: {
     trigger: "Report a problem",
     dialogTitle: "Report a problem",
+    prepare: "Prepare report",
     submit: "Submit report"
   },
 
@@ -193,13 +201,24 @@ createRecorder({
     headers: {}
   },
 
+  transcoder: {
+    endpoint: "/api/prepare",
+    method: "POST",
+    credentials: "same-origin",
+    headers: {}
+  },
+
   callbacks: {
     onOpen() {},
     onClose() {},
-    onCaptureStart({ type }) {},
+    onPermissionCheck({ permissions }) {},
+    onCaptureStart({ type, hasAudio, microphone, permissions }) {},
     onCaptureStop({ type, recording }) {},
     onCaptureError({ type, error }) {},
-    onSnapshot({ snapshot }) {},
+    onPrepareStart({ report }) {},
+    onPrepareSuccess({ result, prepared, report }) {},
+    onPrepareError({ error, report }) {},
+    onPreparedChange({ prepared, stale }) {},
     onSubmitStart({ report }) {},
     onSubmitSuccess({ result, report }) {},
     onSubmitError({ error, report }) {},
@@ -208,9 +227,23 @@ createRecorder({
 });
 ```
 
-`submission.headers` may be an object or an asynchronous function. A function is useful for obtaining a short-lived host-issued token immediately before submission. Never place permanent API, storage, or GitHub credentials in browser configuration.
+`submission.headers` and `transcoder.headers` may be objects or asynchronous functions. A function is useful for obtaining a short-lived host-issued token immediately before a request. Never place permanent API, storage, or GitHub credentials in browser configuration.
 
 The generated elements use `fhr-` prefixed class names. Supply `className` for an additional root class and override the distributed CSS when deeper customisation is needed.
+
+## Recording flow
+
+The initial trigger checks microphone and capture support on every attempt, then starts capture directly. A blocked microphone permission produces an actionable error before the display chooser opens. After the user selects a source, recording continues in the background and the trigger changes to **Stop recording**. Selecting it stops capture and opens the dialog with a playable video preview.
+
+The default capture settings ask compatible browsers to prefer the current browser tab and keep it available in the chooser. These values are browser hints rather than enforced selections. The [Screen Capture specification](https://www.w3.org/TR/screen-capture/#dom-mediadevices-getdisplaymedia) requires the browser to let the user choose a display surface for every capture, so a web page cannot bypass the chooser or silently select the current tab. Browsers that do not support a hint ignore it.
+
+For narration, the user must allow microphone permission. To capture tab or system sound as well, the user must also enable the browser's audio-sharing option in the native chooser when it is offered.
+
+## Preparation contract
+
+When `transcoder.endpoint` is configured, submission is gated behind a preparation step. The recorder posts the current multipart report to that endpoint and displays its JSON response in the dialog's right column. The button text defaults to **Prepare report** and is configurable with `labels.prepare`.
+
+The endpoint may return the prepared fields directly or wrap them in a `prepared` property. Editing the description, removing the video, or replacing the video invalidates the prepared result. **Submit report** is hidden until the latest evidence has been prepared again.
 
 ## Submission contract
 
@@ -221,7 +254,7 @@ The recorder sends one `multipart/form-data` request to `submission.endpoint`. T
 | `description` | text | The problem description entered by the user. |
 | `metadata` | JSON text | Page, browser, viewport, configured metadata, and evidence summary. |
 | `video` | file | Optional WebM screen recording with narration. |
-| `snapshots` | repeated files | Zero or more PNG screen snapshots. |
+| `prepared` | JSON text | Optional prepared developer report returned by the transcoder. |
 
 Example parsed metadata:
 
@@ -240,7 +273,7 @@ Example parsed metadata:
   "application": "customer-portal",
   "evidence": {
     "hasVideo": true,
-    "snapshotCount": 2,
+    "hasAudio": true,
     "recordingDurationMs": 18420
   }
 }
@@ -268,10 +301,14 @@ Callbacks have matching bubbling DOM events on the recorder root:
 ```text
 firsthand:open
 firsthand:close
+firsthand:permission-check
 firsthand:capture-start
 firsthand:capture-stop
 firsthand:capture-error
-firsthand:snapshot
+firsthand:prepare-start
+firsthand:prepare-success
+firsthand:prepare-error
+firsthand:prepared-change
 firsthand:submit-start
 firsthand:submit-success
 firsthand:submit-error
@@ -292,7 +329,8 @@ document.addEventListener("firsthand:response", (event) => {
 - `close()`
 - `startRecording()`
 - `stopRecording()`
-- `takeSnapshot()`
+- `toggleRecording()`
+- `prepare()`
 - `getReport()`
 - `submit()`
 - `reset()`
