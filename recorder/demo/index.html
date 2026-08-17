@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Firsthand Recorder Demo</title>
+    <link rel="stylesheet" href="/dist/firsthand-recorder.css">
+    <style>
+      body {
+        background: #f4f6fb;
+        color: #182033;
+        font-family: Inter, system-ui, sans-serif;
+        margin: 0;
+        min-height: 100vh;
+      }
+
+      main {
+        margin: 0 auto;
+        max-width: 820px;
+        padding: 72px 24px;
+      }
+
+      .demo-card {
+        background: #fff;
+        border: 1px solid #d8deea;
+        border-radius: 18px;
+        box-shadow: 0 12px 36px rgb(30 45 85 / 10%);
+        padding: 32px;
+      }
+
+      #result {
+        background: #101828;
+        border-radius: 10px;
+        color: #d0d5dd;
+        min-height: 72px;
+        overflow: auto;
+        padding: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="demo-card">
+        <p>Firsthand Recorder</p>
+        <h1>CDN build demonstration</h1>
+        <p>Open the recorder, describe a problem, and submit it to the local mock endpoint.</p>
+        <h2>Latest callback response</h2>
+        <pre id="result">No report submitted yet.</pre>
+      </div>
+    </main>
+
+    <script src="/dist/firsthand-recorder.js"></script>
+    <script>
+      FirsthandRecorder.createRecorder({
+        position: "bottom-right",
+        submission: {
+          endpoint: "/api/reports"
+        },
+        metadata: {
+          application: "recorder-demo"
+        },
+        theme: {
+          primaryColor: "#5b3fd6"
+        },
+        callbacks: {
+          onResponse({ result }) {
+            document.querySelector("#result").textContent = JSON.stringify(result.body, null, 2);
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
