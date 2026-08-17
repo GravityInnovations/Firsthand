@@ -1,0 +1,46 @@
+{
+  "name": "@gravityinnovations/firsthand-recorder",
+  "version": "0.1.0",
+  "description": "Lightweight, framework-neutral screen recording and issue evidence widget.",
+  "type": "module",
+  "module": "./dist/firsthand-recorder.esm.js",
+  "browser": "./dist/firsthand-recorder.js",
+  "style": "./dist/firsthand-recorder.css",
+  "exports": {
+    ".": {
+      "import": "./dist/firsthand-recorder.esm.js"
+    },
+    "./styles.css": "./dist/firsthand-recorder.css"
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "node ./scripts/build.mjs",
+    "check": "npm run build && node --test",
+    "demo": "node ./demo/server.mjs",
+    "pack:check": "npm pack --dry-run"
+  },
+  "keywords": [
+    "bug-reporting",
+    "feedback-widget",
+    "screen-recording",
+    "screenshot",
+    "github-issues"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GravityInnovations/Firsthand.git",
+    "directory": "recorder"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "jsdom": "^26.1.0"
+  }
+}
