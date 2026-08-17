@@ -1,5 +1,10 @@
 # Local integration tests
 
+This directory contains two independent integrations:
+
+- `html` loads the CDN/classic-script build in a framework-free dashboard.
+- `nextjs` consumes the recorder through its npm/ESM package from a Next.js client component.
+
 The `html` test is a framework-free dashboard that loads the recorder from the repository's local `recorder/dist` build. Its mock endpoint accepts the multipart request in memory and returns a test response; it does not upload or retain the recording.
 
 From the repository root, run:
