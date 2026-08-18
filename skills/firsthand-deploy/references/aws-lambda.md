@@ -1,6 +1,6 @@
-# AWS Lambda deployment
+# AWS Lambda packaging
 
-Deploy transcoder and reporter as separate Lambda functions behind separate API Gateway routes. Use Linux-compatible dependency builds for native modules and binaries.
+Prepare transcoder and reporter as separate Lambda functions behind separate API Gateway routes. Generate files only under `dist/deployments/aws-lambda/`; do not deploy them. Use Linux-compatible dependency builds for native modules and binaries.
 
 ## Transcoder
 
@@ -8,7 +8,7 @@ The transcoder includes local Whisper/ONNX and ffmpeg. Confirm whether the user 
 
 ## Reporter
 
-Do not deploy the current SQLite mapping as ordinary Lambda local storage: Lambda filesystems are ephemeral and concurrent invocations do not share a database. Ask the user to choose one before deploying:
+Do not package the current SQLite mapping as ordinary Lambda local storage: Lambda filesystems are ephemeral and concurrent invocations do not share a database. Ask the user to choose one before generating assets:
 
 - RDS/Aurora or another managed SQL database;
 - DynamoDB with an equivalent issue/comment mapping design; or
@@ -16,6 +16,6 @@ Do not deploy the current SQLite mapping as ordinary Lambda local storage: Lambd
 
 Use S3/R2/HTTP storage for evidence, not host filesystem storage. Keep `GITHUB_*`, `REPORTER_CLIENT_*`, and storage credentials server-side. The reporter needs an externally reachable recording URL if that URL is included in GitHub issues.
 
-## Before deployment
+## Before generating Lambda assets
 
-Confirm AWS account/region, API Gateway auth and CORS policy, target environment, persistent reporter datastore, evidence destination, secret locations, and whether cloud-resource creation is authorised. Only then add IaC or execute deployment commands.
+Ask one item at a time: AWS region, API Gateway auth and CORS policy, target environment, persistent reporter datastore, evidence destination, and secret-manager choice. Generate IaC and deployment instructions with placeholder resource identifiers only. Never execute deployment commands.

@@ -1,32 +1,37 @@
-# Local integration tests
+# Local integrations
 
-This directory contains two independent integrations:
+The test applications exercise the same three boundaries used by a host application:
 
-- `html` loads the CDN/classic-script build in a framework-free dashboard.
-- `nextjs` consumes the recorder through its npm/ESM package from a Next.js client component.
+1. Recorder posts evidence to a host route.
+2. The host route proxies preparation to transcoder.
+3. After user review, the host route forwards the prepared report and original video to reporter.
 
-The `html` test is a framework-free dashboard that loads the recorder from the repository's local `recorder/dist` build. Its `POST /api/prepare` route proxies multipart evidence to the locally running transcoder and maps its response into the recorder's prepared-report contract. Final report submission remains an in-memory mock; it does not upload or retain the recording.
+The browser never receives OpenAI, GitHub, storage, or reporter-client secrets.
 
-From two terminals, run:
+## HTML dashboard
 
-```bash
-cd transcoder
-npm run dev
-```
+Start reporter on `4200` with `REPORTER_CLIENT_ID`, `REPORTER_CLIENT_SECRET`, storage, and—only for live issue delivery—GitHub configuration. Start transcoder on `4100` for real preparation. Then start the dashboard with matching reporter client credentials:
 
-Then, from the repository root:
-
-```bash
+```powershell
+$env:REPORTER_CLIENT_ID = "local-test"
+$env:REPORTER_CLIENT_SECRET = "your-local-secret"
 node tests/html/server.mjs
 ```
 
-Then open [http://127.0.0.1:4174](http://127.0.0.1:4174).
+Open [http://127.0.0.1:4174](http://127.0.0.1:4174). `POST /api/prepare` proxies to `TRANSCODER_URL` (default `http://127.0.0.1:4100/v1/prepare`); `POST /api/reports` proxies to `REPORTER_URL` (default `http://127.0.0.1:4200/v1/issues`). Set `USE_MOCK_TRANSCODER=1` to use the fixture without starting transcoder.
 
-Test the fixed recorder trigger and the dashboard's **Record a problem** button. The first click checks capture permissions and starts screen recording; the second stops it. Review the video, add a description, select **Prepare report**, inspect the local transcoder result, and submit it. Editing the text or replacing the video makes the prepared result stale and requires preparation again.
+The dashboard uses `local-system-user-001` as its non-sensitive test user identifier. Recording requires browser permission and `localhost` or HTTPS.
 
-By default, preparation is proxied to `http://127.0.0.1:4100/v1/prepare`. Set `TRANSCODER_URL` to use a different local address. Set `USE_MOCK_TRANSCODER=1` only when you intentionally want the old fixture response from `html/transcoder-response.json`.
+## Next.js test
 
-Screen recording and microphone narration require browser permission. `localhost` is treated as a secure browser context for these APIs.
-## Recording storage
+From `tests/nextjs`, install dependencies and start the app with host-only reporter credentials:
 
-The local HTML submission endpoint forwards the captured video, prepared report, and test system-user identifier to the separate reporter's `POST /v1/issues`. Configure `REPORTER_CLIENT_ID` and `REPORTER_CLIENT_SECRET` on the reporter and this local test server. Configure GitHub delivery on the reporter; preparation remains usable without it.
+```powershell
+$env:REPORTER_CLIENT_ID = "local-test"
+$env:REPORTER_CLIENT_SECRET = "your-local-secret"
+npm run dev
+```
+
+Open [http://127.0.0.1:3000](http://127.0.0.1:3000). The App Router routes follow the same defaults and environment variables as the HTML dashboard. Set `USE_MOCK_TRANSCODER=1` to use the local preparation fixture.
+
+Live final submissions store evidence and create GitHub issues through reporter. Use a reporter instance with `GITHUB_ENABLED=false` when you only want to verify the request path without creating an issue.

@@ -12,7 +12,7 @@ The service owns:
 - OpenAI report generation;
 - validation of the structured report response.
 
-The service does not own browser recording, GitHub authentication, issue creation, comment synchronisation, or the decision to publish a report. Its optional evidence endpoint stores recordings only in explicitly configured destinations.
+The service does not own browser recording, evidence storage, GitHub authentication, issue creation, comment synchronisation, or the decision to publish a report.
 
 ## Run locally
 
@@ -117,9 +117,7 @@ TRANSFORMER_MODEL=gpt-5.6-luna
 
 OpenAI is asked for JSON that is validated against the Firsthand prepared-report schema. The browser never sees the API key. `TRANSFORMER_INSTRUCTIONS` can supply additional server-side editorial guidance. `TRANSFORMER_BASE_URL` is optional for an OpenAI-compatible gateway endpoint.
 
-## Boundary
-
-`POST /v1/prepare` is the transcoder's only public workflow. It interprets uploaded evidence and returns a prepared report; it does not store recordings or publish GitHub issues. Send the reviewed report and original video to the independent [`reporter`](../reporter/README.md) API.
+The only application endpoint is `POST /v1/prepare`. It interprets uploaded evidence and returns a prepared report; it does not store recordings or publish GitHub issues. Send the reviewed report and original video to the independent [`reporter`](../reporter/README.md) API.
 
 ## Authentication and CORS
 

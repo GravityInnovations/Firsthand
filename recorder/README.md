@@ -208,6 +208,11 @@ createRecorder({
     headers: {}
   },
 
+  reporter: {
+    // A non-sensitive application user ID; never a GitHub username or token.
+    userIdentifier: "customer-123"
+  },
+
   callbacks: {
     onOpen() {},
     onClose() {},
@@ -255,6 +260,7 @@ The recorder sends one `multipart/form-data` request to `submission.endpoint`. T
 | `metadata` | JSON text | Page, browser, viewport, configured metadata, and evidence summary. |
 | `video` | file | Optional WebM screen recording with narration. |
 | `prepared` | JSON text | Optional prepared developer report returned by the transcoder. |
+| `userIdentifier` | text | Optional non-sensitive application user identifier for reporter issue lookup. |
 
 Example parsed metadata:
 
@@ -285,8 +291,10 @@ The endpoint may return JSON or text. A successful response is exposed as:
 {
   status: 201,
   body: {
-    reportId: "rpt_123",
-    status: "received"
+    reportId: "rep_123",
+    workflowStatus: "submitted",
+    workflowStatusLabel: "Developer review required",
+    state: "open"
   },
   response: Response
 }

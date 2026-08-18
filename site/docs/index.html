@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="A simple guide to implementing Firsthand in your product.">
+    <meta name="theme-color" content="#11213f">
+    <title>Implement Firsthand — Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+  </head>
+  <body>
+    <a class="skip-link" href="#main-content">Skip to content</a>
+    <header class="site-header">
+      <a class="brand" href="../" aria-label="Firsthand home"><span class="brand-mark">F</span>Firsthand</a>
+      <nav aria-label="Primary navigation"><a href="../#how-it-works">How it works</a><a href="./" aria-current="page">Docs</a><a href="https://github.com/GravityInnovations/Firsthand">GitHub <span aria-hidden="true">↗</span></a></nav>
+    </header>
+    <main id="main-content">
+      <section class="docs-hero">
+        <p class="eyebrow">Implementation guide</p>
+        <h1>Add a better problem-reporting flow to your product.</h1>
+        <p>Firsthand has three independent pieces. Add the recorder to your product, run the transcoder to prepare an editable report, then run the reporter to store approved evidence and create GitHub issues.</p>
+      </section>
+      <div class="docs-layout">
+        <aside class="docs-nav" aria-label="Documentation sections"><p>On this page</p><a href="#overview">Overview</a><a href="#run-services">Run the services</a><a href="#add-recorder">Add the recorder</a><a href="#secure-proxy">Use secure routes</a><a href="#reporter">Configure the reporter</a><a href="#endpoints">Endpoints</a><a href="#next-steps">Next steps</a></aside>
+        <article class="docs-content">
+          <section id="overview"><p class="eyebrow">Start here</p><h2>What you need</h2><p>Node.js 20 or newer, a place to run two Node services, and a GitHub repository if you want Firsthand to create issues. The recorder itself runs in the browser, but the credentials must stay on your server.</p><div class="callout"><strong>The important boundary:</strong> the browser sends evidence to your own trusted routes. Those routes call the transcoder and reporter. Do not put OpenAI, storage or GitHub keys in frontend code.</div></section>
+          <section id="run-services"><p class="eyebrow">1. Start the backends</p><h2>Run the transcoder and reporter separately.</h2><p>Clone the repository, then install and start each service in its own process.</p><pre><code>cd transcoder
+npm install
+# set TRANSFORMER_API_KEY in the server environment
+npm run dev
+
+cd ../reporter
+npm install
+# set reporter, storage and GitHub settings in the server environment
+npm run dev</code></pre><p>The transcoder listens on <code>http://127.0.0.1:4100</code> locally. The reporter listens on <code>http://127.0.0.1:4200</code>.</p></section>
+          <section id="add-recorder"><p class="eyebrow">2. Add the recorder</p><h2>Mount one small browser component.</h2><p>Build the recorder package locally or install it once it is published. Import its stylesheet from your application’s global style entry, then mount it inside a browser client component.</p><pre><code>import "@gravityinnovations/firsthand-recorder/styles.css";
+import { createRecorder } from "@gravityinnovations/firsthand-recorder";
+
+const recorder = createRecorder({
+  position: "bottom-right",
+  reporter: { userIdentifier: currentUser.id },
+  transcoder: { endpoint: "/api/firsthand/prepare" },
+  submission: { endpoint: "/api/firsthand/reports" },
+  metadata: { application: "customer-portal" }
+});</code></pre><p>The recorder requires a secure browser context: HTTPS in production or <code>localhost</code> while developing. The browser always asks the user which screen, window or tab to share.</p></section>
+          <section id="secure-proxy"><p class="eyebrow">3. Keep credentials on the server</p><h2>Proxy browser requests through your application.</h2><p>Create two server-side routes. The first forwards the recorder’s multipart evidence to the transcoder. The second forwards the reviewed prepared report and original recording to the reporter using the reporter’s Basic-auth client credentials.</p><ul><li><strong>Prepare route:</strong> browser → your server → transcoder <code>POST /v1/prepare</code></li><li><strong>Submit route:</strong> browser → your server → reporter <code>POST /v1/issues</code></li></ul><p>The repository’s <code>tests/nextjs</code> example shows these two routes using a Next.js App Router integration. The static <code>tests/html</code> example shows the same shape without a framework.</p></section>
+          <section id="reporter"><p class="eyebrow">4. Configure issue creation</p><h2>Give the reporter storage and GitHub access.</h2><p>For a local test, host storage is enough. In production, choose the storage provider that fits your infrastructure: host, FTP, S3, R2 or an HTTP upload service that returns a URL.</p><pre><code>REPORTER_CLIENT_ID=your-server-client-id
+REPORTER_CLIENT_SECRET=a-long-random-secret
+STORAGE_PROVIDERS=host
+STORAGE_HOST_ROOT_PATH=.evidence
+STORAGE_HOST_PUBLIC_BASE_URL=https://reporter.example.com/v1/evidence-files
+
+GITHUB_ENABLED=true
+GITHUB_AUTH_MODE=token
+GITHUB_OWNER=GravityInnovations
+GITHUB_REPOSITORY=Firsthand
+GITHUB_TOKEN=server-side-fine-grained-token
+
+REPORTER_INITIAL_STATUS=submitted
+REPORTER_INITIAL_STATUS_LABEL=Developer review required</code></pre><p>Use a fine-grained GitHub token limited to the chosen repository with <strong>Issues: read and write</strong>. Keep it in your deployment environment, never in a browser bundle or committed file.</p></section>
+          <section id="endpoints"><p class="eyebrow">The API surface</p><h2>The endpoints your server uses.</h2><table class="endpoint-table"><thead><tr><th>Service</th><th>Endpoint</th><th>Purpose</th></tr></thead><tbody><tr><td>Transcoder</td><td><code>POST /v1/prepare</code></td><td>Creates an editable report from description, metadata and media.</td></tr><tr><td>Reporter</td><td><code>POST /v1/issues</code></td><td>Stores approved evidence and creates the mapped GitHub issue.</td></tr><tr><td>Reporter</td><td><code>GET /v1/users/:userIdentifier/issues</code></td><td>Returns the issues for one of your system users.</td></tr><tr><td>Reporter</td><td><code>GET /v1/issues/:reportId/comments</code></td><td>Returns refreshed GitHub comments for that mapped issue.</td></tr><tr><td>Reporter</td><td><code>POST /v1/issues/:reportId/comments</code></td><td>Adds a user reply to the mapped GitHub issue.</td></tr></tbody></table></section>
+          <section id="next-steps"><p class="eyebrow">Then make it yours</p><h2>Start locally. Change only what you need.</h2><p>Use the HTML test first to verify recording, report preparation and issue creation. Then copy the Next.js route pattern into your product. The recorder theme, labels, capture settings and metadata are all configurable without changing the service boundaries.</p><p><a class="button button-primary" href="https://github.com/GravityInnovations/Firsthand">Open the GitHub repository</a></p></section>
+        </article>
+      </div>
+    </main>
+    <footer><a class="brand" href="../"><span class="brand-mark">F</span>Firsthand</a><span>Open source by Gravity Innovations</span><a href="https://github.com/GravityInnovations/Firsthand">GitHub</a></footer>
+  </body>
+</html>

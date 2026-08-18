@@ -22,6 +22,8 @@ npm run dev
 
 Use a fine-grained GitHub token restricted to the selected repository with **Issues: read and write**. All environment variables are listed in [`.env.example`](./.env.example); do not put real values in that file or browser code.
 
+`REPORTER_INITIAL_STATUS` and `REPORTER_INITIAL_STATUS_LABEL` control the host workflow value returned for new reports. Their defaults are `submitted` and `Developer review required`. This is distinct from GitHub's own `state`, which remains `open` until a developer closes the issue in GitHub.
+
 ## API
 
 Every endpoint except `/health` needs HTTP Basic auth using `REPORTER_CLIENT_ID` and `REPORTER_CLIENT_SECRET`.
@@ -35,6 +37,8 @@ Every endpoint except `/health` needs HTTP Basic auth using `REPORTER_CLIENT_ID`
 | `GET /v1/evidence-files/*` | Local-host storage only; exposes a returned recording URL for development. |
 
 Evidence destinations are independent and configurable through `STORAGE_PROVIDERS`: `host`, `ftp`, `s3`, `r2`, and `http`. Production host storage should be served through authenticated downloads or a controlled public URL.
+
+New issue responses and user-scoped issue listings include both `workflowStatus` / `workflowStatusLabel` for the host experience and `state` for GitHub's issue state.
 
 ## Boundary
 
