@@ -16,6 +16,12 @@ Firsthand is organised into three independently developed areas:
 
 Each area owns a clear boundary and should be usable without depending on its neighbours' internal implementation.
 
+## Release artifacts
+
+Run `npm run build:release` from the repository root to create independent artifacts in [`dist`](./dist/README.md): `dist/recorder`, `dist/transcoder`, and `dist/reporter`. Validate the generated layout with `npm run check:release`.
+
+The reusable [`firsthand-deploy`](./skills/firsthand-deploy/SKILL.md) skill guides package/deployment choices, including npm distribution for recorder and separate AWS Lambda routes for transcoder and reporter.
+
 ## Intended workflow
 
 1. The recorder captures user evidence and sends it to the transcoder for preparation.

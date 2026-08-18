@@ -6,6 +6,8 @@ transcoder/.evidence/
 reporter/firsthand-reporter.sqlite*
 reporter/.evidence/
 .next/
-dist/
+**/dist/*
+!/dist/.gitkeep
+!/dist/README.md
 .env
 *.log
