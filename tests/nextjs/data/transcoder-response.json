@@ -1,0 +1,15 @@
+{
+  "prepared": {
+    "title": "Project status changes are not reflected in the progress table",
+    "summary": "The user updates a project's status, but the overview table continues to show the previous progress value.",
+    "stepsToReproduce": [
+      "Open the workspace overview",
+      "Change a project's status",
+      "Return to the recent projects table"
+    ],
+    "expectedBehaviour": "The status and progress values should refresh immediately after the change is saved.",
+    "actualBehaviour": "The table continues to display stale project values until the page is reloaded.",
+    "developerNotes": "Review client-side cache invalidation and the project-list refresh triggered after a successful update.",
+    "suggestedLabels": ["bug", "frontend", "needs-triage"]
+  }
+}

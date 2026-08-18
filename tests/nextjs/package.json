@@ -1,0 +1,16 @@
+{
+  "name": "firsthand-nextjs-test",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@gravityinnovations/firsthand-recorder": "file:../../recorder",
+    "next": "16.3.1",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  }
+}
