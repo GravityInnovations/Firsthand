@@ -71,6 +71,9 @@ const DEFAULT_OPTIONS = Object.freeze({
     headers: {},
     credentials: "same-origin"
   },
+  reporter: {
+    userIdentifier: ""
+  },
   callbacks: {}
 });
 
@@ -103,6 +106,7 @@ function normalizeOptions(supplied = {}) {
     metadata: mergeObject(DEFAULT_OPTIONS.metadata, supplied.metadata),
     submission: mergeObject(DEFAULT_OPTIONS.submission, supplied.submission),
     transcoder: mergeObject(DEFAULT_OPTIONS.transcoder, supplied.transcoder),
+    reporter: mergeObject(DEFAULT_OPTIONS.reporter, supplied.reporter),
     callbacks: mergeObject(DEFAULT_OPTIONS.callbacks, supplied.callbacks)
   };
 }
@@ -157,7 +161,11 @@ class SubmissionError extends Error {
   }
 }
 
-function buildFormData(report, FormDataClass = globalThis.FormData) {
+function buildFormData(report, userIdentifier = "", FormDataClass = globalThis.FormData) {
+  if (typeof userIdentifier !== "string") {
+    FormDataClass = userIdentifier;
+    userIdentifier = "";
+  }
   if (!FormDataClass) {
     throw new Error("FormData is not available in this environment.");
   }
@@ -165,6 +173,9 @@ function buildFormData(report, FormDataClass = globalThis.FormData) {
   const formData = new FormDataClass();
   formData.append("description", report.description || "");
   formData.append("metadata", JSON.stringify(report.metadata || {}));
+  if (userIdentifier) {
+    formData.append("userIdentifier", userIdentifier);
+  }
 
   if (report.video?.blob) {
     formData.append(
@@ -213,7 +224,7 @@ async function submitReport(report, options, fetchImplementation = globalThis.fe
     method: submission.method,
     headers: configuredHeaders || {},
     credentials: submission.credentials,
-    body: buildFormData(report)
+    body: buildFormData(report, options.reporter?.userIdentifier || "")
   });
 
   const body = await readResponse(response);

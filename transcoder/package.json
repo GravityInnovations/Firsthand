@@ -1,0 +1,37 @@
+{
+  "name": "@gravityinnovations/firsthand-transcoder",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Provider-neutral service that turns Firsthand evidence into structured developer reports.",
+  "type": "module",
+  "main": "./dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "node --import tsx --test test/*.test.ts",
+    "check": "npm run typecheck && npm test && npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@fastify/cors": "^11.0.0",
+    "@fastify/multipart": "^9.0.0",
+    "@huggingface/transformers": "^4.2.0",
+    "fastify": "^5.0.0",
+    "ffmpeg-static": "^5.2.0",
+    "wavefile": "^11.0.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "tsx": "^4.0.0",
+    "typescript": "^5.0.0"
+  },
+  "overrides": {
+    "adm-zip": "^0.6.0",
+    "sharp": "^0.35.3"
+  }
+}

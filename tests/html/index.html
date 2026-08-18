@@ -156,9 +156,9 @@
 
           <section class="card test-panel">
             <h2>Recorder test output</h2>
-            <p class="subtle">Callbacks from the embedded plugin appear here.</p>
+            <p class="subtle">The recorder prepares reports through the local transcoder; final submission stores the original recording through its separate evidence endpoint.</p>
             <div class="test-layout">
-              <div class="hint"><strong>Test checklist</strong><br>Start recording, allow microphone access and select tab audio, then stop. Review the video, describe the issue, prepare the report, and submit.</div>
+              <div class="hint"><strong>Test checklist</strong><br>Start the transcoder on port 4100, then start this dashboard. Record a tab with microphone audio, describe the issue, and select Prepare report. The displayed report comes from local Whisper and the local report transformer.</div>
               <pre id="callback-log">Ready. The Firsthand recorder is mounted at bottom-right.</pre>
             </div>
           </section>
@@ -179,8 +179,13 @@
       const recorder = FirsthandRecorder.createRecorder({
         position: "bottom-right",
         maxRecordingMs: 60000,
+        features: {
+          microphone: true,
+          systemAudio: false
+        },
         submission: { endpoint: "/api/reports" },
         transcoder: { endpoint: "/api/prepare" },
+        reporter: { userIdentifier: "local-system-user-001" },
         metadata: {
           application: "northstar-local-test",
           environment: "local"
@@ -207,8 +212,20 @@
             showEvent("Video captured", { bytes: recording.blob.size, durationMs: recording.durationMs, hasAudio: recording.hasAudio });
           },
           onPrepareStart() { showEvent("Preparing developer report"); },
-          onPrepareSuccess({ prepared }) { showEvent("Developer report prepared", prepared); },
-          onPrepareError({ error }) { showEvent("Preparation failed", { message: error.message }); },
+          onPrepareSuccess({ prepared, result }) {
+            showEvent("Developer report prepared", {
+              prepared,
+              transcription: result.body?.transcription,
+              warnings: result.body?.warnings,
+              requestId: result.body?.requestId
+            });
+          },
+          onPrepareError({ error }) {
+            showEvent("Preparation failed", {
+              message: error.message,
+              response: error.response
+            });
+          },
           onSubmitStart({ report }) { showEvent("Submitting report", { hasVideo: Boolean(report.video), prepared: Boolean(report.prepared) }); },
           onSubmitSuccess({ result }) { showEvent("Submission succeeded", result.body); },
           onSubmitError({ error }) { showEvent("Submission failed", { message: error.message }); }

@@ -1,3 +1,11 @@
 node_modules/
 .npm-cache/
+.transformers-cache/
+transcoder/firsthand-reporter.sqlite*
+transcoder/.evidence/
+reporter/firsthand-reporter.sqlite*
+reporter/.evidence/
+.next/
+dist/
+.env
 *.log

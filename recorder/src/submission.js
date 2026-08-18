@@ -7,7 +7,11 @@ export class SubmissionError extends Error {
   }
 }
 
-export function buildFormData(report, FormDataClass = globalThis.FormData) {
+export function buildFormData(report, userIdentifier = "", FormDataClass = globalThis.FormData) {
+  if (typeof userIdentifier !== "string") {
+    FormDataClass = userIdentifier;
+    userIdentifier = "";
+  }
   if (!FormDataClass) {
     throw new Error("FormData is not available in this environment.");
   }
@@ -15,6 +19,9 @@ export function buildFormData(report, FormDataClass = globalThis.FormData) {
   const formData = new FormDataClass();
   formData.append("description", report.description || "");
   formData.append("metadata", JSON.stringify(report.metadata || {}));
+  if (userIdentifier) {
+    formData.append("userIdentifier", userIdentifier);
+  }
 
   if (report.video?.blob) {
     formData.append(
@@ -63,7 +70,7 @@ export async function submitReport(report, options, fetchImplementation = global
     method: submission.method,
     headers: configuredHeaders || {},
     credentials: submission.credentials,
-    body: buildFormData(report)
+    body: buildFormData(report, options.reporter?.userIdentifier || "")
   });
 
   const body = await readResponse(response);
