@@ -13,6 +13,7 @@ await mkdir(output, { recursive: true });
 
 await Promise.all([
   ...packages.map((name) => rm(resolve(output, name), { recursive: true, force: true })),
+  rm(resolve(output, "github-pages"), { recursive: true, force: true }),
   rm(resolve(output, "manifest.json"), { force: true })
 ]);
 
@@ -27,13 +28,16 @@ for (const name of packages) {
   }
 }
 
+await cp(resolve(root, "site"), resolve(output, "github-pages"), { recursive: true });
+
 const manifest = {
   name: "Firsthand release",
   createdAt: new Date().toISOString(),
   components: Object.fromEntries(await Promise.all(packages.map(async (name) => {
     const metadata = JSON.parse(await readFile(resolve(root, name, "package.json"), "utf8"));
     return [name, { name: metadata.name, version: metadata.version, artifact: `${name}/` }];
-  })))
+  }))),
+  githubPages: { artifact: "github-pages/", entrypoint: "github-pages/index.html" }
 };
 await writeFile(resolve(output, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
 console.log(`Firsthand release artifacts created in ${output}`);
