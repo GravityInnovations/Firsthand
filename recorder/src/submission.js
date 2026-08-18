@@ -24,12 +24,8 @@ export function buildFormData(report, FormDataClass = globalThis.FormData) {
     );
   }
 
-  for (const [index, snapshot] of (report.snapshots || []).entries()) {
-    formData.append(
-      "snapshots",
-      snapshot.blob,
-      snapshot.fileName || `snapshot-${index + 1}.png`
-    );
+  if (report.prepared) {
+    formData.append("prepared", JSON.stringify(report.prepared));
   }
 
   return formData;

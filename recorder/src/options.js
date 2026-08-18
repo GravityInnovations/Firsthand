@@ -12,25 +12,34 @@ export const DEFAULT_OPTIONS = Object.freeze({
   className: "",
   closeOnSuccess: false,
   maxRecordingMs: 120000,
-  maxSnapshots: 5,
   features: {
     video: true,
-    snapshot: true,
     description: true,
     microphone: true,
     systemAudio: true
+  },
+  capture: {
+    preferCurrentTab: true,
+    displaySurface: "browser",
+    selfBrowserSurface: "include",
+    surfaceSwitching: "exclude",
+    systemAudio: "include",
+    windowAudio: "system"
   },
   labels: {
     trigger: "Report a problem",
     dialogTitle: "Report a problem",
     dialogDescription: "Show us what happened or describe the problem below.",
-    record: "Record video",
     stop: "Stop recording",
-    snapshot: "Take snapshot",
     description: "What happened?",
     descriptionPlaceholder: "Describe what you were trying to do and what went wrong.",
     submit: "Submit report",
-    submitting: "Submitting…",
+    prepare: "Prepare report",
+    preparing: "Preparing...",
+    preparedTitle: "Prepared developer report",
+    preparedEmpty: "Record and describe the problem, then prepare it for the development team.",
+    prepareSuccess: "The developer report is ready.",
+    submitting: "Submitting...",
     success: "Your report was submitted.",
     close: "Close",
     remove: "Remove"
@@ -52,6 +61,12 @@ export const DEFAULT_OPTIONS = Object.freeze({
     headers: {},
     credentials: "same-origin"
   },
+  transcoder: {
+    endpoint: "",
+    method: "POST",
+    headers: {},
+    credentials: "same-origin"
+  },
   callbacks: {}
 });
 
@@ -67,14 +82,9 @@ export function normalizeOptions(supplied = {}) {
   }
 
   const maxRecordingMs = Number(supplied.maxRecordingMs ?? DEFAULT_OPTIONS.maxRecordingMs);
-  const maxSnapshots = Number(supplied.maxSnapshots ?? DEFAULT_OPTIONS.maxSnapshots);
 
   if (!Number.isFinite(maxRecordingMs) || maxRecordingMs <= 0) {
     throw new TypeError("maxRecordingMs must be a positive number.");
-  }
-
-  if (!Number.isInteger(maxSnapshots) || maxSnapshots < 1) {
-    throw new TypeError("maxSnapshots must be a positive integer.");
   }
 
   return {
@@ -82,12 +92,13 @@ export function normalizeOptions(supplied = {}) {
     ...supplied,
     position,
     maxRecordingMs,
-    maxSnapshots,
     features: mergeObject(DEFAULT_OPTIONS.features, supplied.features),
+    capture: mergeObject(DEFAULT_OPTIONS.capture, supplied.capture),
     labels: mergeObject(DEFAULT_OPTIONS.labels, supplied.labels),
     theme: mergeObject(DEFAULT_OPTIONS.theme, supplied.theme),
     metadata: mergeObject(DEFAULT_OPTIONS.metadata, supplied.metadata),
     submission: mergeObject(DEFAULT_OPTIONS.submission, supplied.submission),
+    transcoder: mergeObject(DEFAULT_OPTIONS.transcoder, supplied.transcoder),
     callbacks: mergeObject(DEFAULT_OPTIONS.callbacks, supplied.callbacks)
   };
 }

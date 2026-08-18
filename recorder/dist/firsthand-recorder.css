@@ -43,8 +43,7 @@
 .fhr-secondary-button,
 .fhr-danger-button,
 .fhr-icon-button,
-.fhr-text-button,
-.fhr-snapshot__remove {
+.fhr-text-button {
   appearance: none;
   border: 0;
   cursor: pointer;
@@ -69,13 +68,26 @@
   filter: brightness(0.94);
 }
 
+.fhr-root--recording .fhr-trigger {
+  background: #b42318;
+}
+
+.fhr-root--recording .fhr-trigger__icon {
+  color: #fff;
+  animation: fhr-recording-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes fhr-recording-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .55; transform: scale(.82); }
+}
+
 .fhr-trigger:focus-visible,
 .fhr-primary-button:focus-visible,
 .fhr-secondary-button:focus-visible,
 .fhr-danger-button:focus-visible,
 .fhr-icon-button:focus-visible,
 .fhr-text-button:focus-visible,
-.fhr-snapshot__remove:focus-visible,
 .fhr-textarea:focus-visible {
   outline: 3px solid color-mix(in srgb, var(--fhr-primary) 35%, transparent);
   outline-offset: 2px;
@@ -106,8 +118,14 @@
   color: var(--fhr-text);
   max-height: min(760px, calc(100vh - 40px));
   max-width: 100%;
-  overflow: auto;
-  width: 560px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  width: 720px;
+}
+
+.fhr-root--has-transcoder .fhr-dialog {
+  width: 1040px;
 }
 
 .fhr-dialog__header {
@@ -117,6 +135,10 @@
   gap: 20px;
   justify-content: space-between;
   padding: 22px 24px 18px;
+  background: var(--fhr-surface);
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 2;
 }
 
 .fhr-dialog__title {
@@ -133,15 +155,32 @@
 
 .fhr-dialog__body {
   display: grid;
-  gap: 18px;
+  gap: 24px;
   padding: 22px 24px;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+.fhr-root--has-transcoder .fhr-dialog__body {
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, .9fr);
+}
+
+.fhr-review-column {
+  display: grid;
+  gap: 18px;
+  min-width: 0;
 }
 
 .fhr-dialog__footer {
   border-top: 1px solid var(--fhr-border);
   display: flex;
+  gap: 10px;
   justify-content: flex-end;
   padding: 16px 24px;
+  background: var(--fhr-surface);
+  flex: 0 0 auto;
+  position: relative;
+  z-index: 2;
 }
 
 .fhr-icon-button {
@@ -165,7 +204,7 @@
 .fhr-capture-actions {
   display: grid;
   gap: 12px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
 }
 
 .fhr-secondary-button,
@@ -197,7 +236,8 @@
   min-width: 150px;
 }
 
-.fhr-primary-button:disabled {
+.fhr-primary-button:disabled,
+.fhr-secondary-button:disabled {
   cursor: not-allowed;
   filter: grayscale(0.35);
   opacity: 0.55;
@@ -282,41 +322,48 @@
   color: var(--fhr-muted);
 }
 
-.fhr-snapshots__grid {
-  display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-}
-
-.fhr-snapshot {
+.fhr-prepared-panel {
+  background: color-mix(in srgb, var(--fhr-primary) 5%, var(--fhr-surface));
   border: 1px solid var(--fhr-border);
-  border-radius: 10px;
+  border-radius: calc(var(--fhr-radius) - 2px);
+  min-width: 0;
+  padding: 18px;
+}
+
+.fhr-prepared-panel__title {
+  font-size: 16px;
+  margin: 0 0 14px;
+}
+
+.fhr-prepared-panel__content {
+  color: var(--fhr-muted);
+  display: grid;
+  gap: 14px;
+}
+
+.fhr-prepared-field {
+  background: var(--fhr-surface);
+  border: 1px solid color-mix(in srgb, var(--fhr-border) 72%, transparent);
+  border-radius: 9px;
+  padding: 12px;
+}
+
+.fhr-prepared-field h4 {
+  color: var(--fhr-text);
+  font-size: 12px;
+  letter-spacing: .04em;
+  margin: 0 0 5px;
+  text-transform: uppercase;
+}
+
+.fhr-prepared-field div,
+.fhr-prepared-field ul {
+  color: var(--fhr-text);
   margin: 0;
-  overflow: hidden;
-  position: relative;
+  white-space: pre-wrap;
 }
 
-.fhr-snapshot img {
-  aspect-ratio: 16 / 10;
-  display: block;
-  object-fit: cover;
-  width: 100%;
-}
-
-.fhr-snapshot__remove {
-  align-items: center;
-  background: rgb(15 23 42 / 78%);
-  border-radius: 50%;
-  color: #fff;
-  display: flex;
-  font-size: 18px;
-  height: 28px;
-  justify-content: center;
-  position: absolute;
-  right: 6px;
-  top: 6px;
-  width: 28px;
-}
+.fhr-prepared-field ul { padding-left: 19px; }
 
 .fhr-status {
   color: var(--fhr-muted);
@@ -329,6 +376,12 @@
 @keyframes fhr-pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.35; }
+}
+
+@media (max-width: 820px) {
+  .fhr-root--has-transcoder .fhr-dialog__body {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 620px) {
@@ -377,6 +430,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .fhr-root--recording .fhr-trigger__icon,
   .fhr-recording__dot {
     animation: none;
   }
