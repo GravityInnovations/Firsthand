@@ -18,7 +18,7 @@ Each area owns a clear boundary and should be usable without depending on its ne
 
 ## Release artifacts
 
-Run `npm run build:release` from the repository root to create independent artifacts in [`dist`](./dist/README.md): `dist/recorder`, `dist/transcoder`, `dist/reporter`, and the GitHub Pages-ready marketing site at `dist/github-pages`. Validate the generated layout with `npm run check:release`.
+Run `npm run build:release` from the repository root to create independent artifacts in [`dist`](./dist/README.md): `dist/recorder`, `dist/transcoder`, `dist/reporter`, and the GitHub Pages-ready marketing site at `dist/github-pages`. Its public implementation guide is at `dist/github-pages/docs/`. Validate the generated layout with `npm run check:release`.
 
 The reusable [`firsthand-deploy`](./skills/firsthand-deploy/SKILL.md) skill asks for packaging choices and creates deployment-ready artifacts under `dist`; it never deploys or publishes.
 

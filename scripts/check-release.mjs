@@ -8,5 +8,6 @@ for (const name of ["recorder", "transcoder", "reporter"]) {
   await access(resolve(root, "dist", name, "dist"));
 }
 await access(resolve(root, "dist", "github-pages", "index.html"));
+await access(resolve(root, "dist", "github-pages", "docs", "index.html"));
 if (!manifest.components?.recorder || !manifest.components?.transcoder || !manifest.components?.reporter || !manifest.githubPages) throw new Error("Release manifest is incomplete.");
 console.log("Firsthand release layout is valid.");

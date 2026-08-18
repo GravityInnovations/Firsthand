@@ -37,7 +37,7 @@ const manifest = {
     const metadata = JSON.parse(await readFile(resolve(root, name, "package.json"), "utf8"));
     return [name, { name: metadata.name, version: metadata.version, artifact: `${name}/` }];
   }))),
-  githubPages: { artifact: "github-pages/", entrypoint: "github-pages/index.html" }
+  githubPages: { artifact: "github-pages/", entrypoint: "github-pages/index.html", documentation: "github-pages/docs/" }
 };
 await writeFile(resolve(output, "manifest.json"), `${JSON.stringify(manifest, null, 2)}\n`);
 console.log(`Firsthand release artifacts created in ${output}`);
