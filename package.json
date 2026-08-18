@@ -1,0 +1,8 @@
+{
+  "name": "@gravityinnovations/firsthand",
+  "private": true,
+  "scripts": {
+    "build:release": "node scripts/build-release.mjs",
+    "check:release": "node scripts/check-release.mjs"
+  }
+}

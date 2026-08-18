@@ -67,6 +67,9 @@ export const DEFAULT_OPTIONS = Object.freeze({
     headers: {},
     credentials: "same-origin"
   },
+  reporter: {
+    userIdentifier: ""
+  },
   callbacks: {}
 });
 
@@ -99,6 +102,7 @@ export function normalizeOptions(supplied = {}) {
     metadata: mergeObject(DEFAULT_OPTIONS.metadata, supplied.metadata),
     submission: mergeObject(DEFAULT_OPTIONS.submission, supplied.submission),
     transcoder: mergeObject(DEFAULT_OPTIONS.transcoder, supplied.transcoder),
+    reporter: mergeObject(DEFAULT_OPTIONS.reporter, supplied.reporter),
     callbacks: mergeObject(DEFAULT_OPTIONS.callbacks, supplied.callbacks)
   };
 }

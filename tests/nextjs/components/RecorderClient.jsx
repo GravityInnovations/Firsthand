@@ -23,6 +23,7 @@ export function RecorderClient() {
       maxRecordingMs: 60000,
       submission: { endpoint: "/api/reports" },
       transcoder: { endpoint: "/api/prepare" },
+      reporter: { userIdentifier: process.env.NEXT_PUBLIC_FIRSTHAND_USER_IDENTIFIER || "local-nextjs-user-001" },
       metadata: { application: "firsthand-nextjs-test", framework: "nextjs" },
       labels: {
         trigger: "Record problem",
