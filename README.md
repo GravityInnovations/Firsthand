@@ -20,7 +20,7 @@ Each area owns a clear boundary and should be usable without depending on its ne
 
 Run `npm run build:release` from the repository root to create independent artifacts in [`dist`](./dist/README.md): `dist/recorder`, `dist/transcoder`, and `dist/reporter`. Validate the generated layout with `npm run check:release`.
 
-The reusable [`firsthand-deploy`](./skills/firsthand-deploy/SKILL.md) skill guides package/deployment choices, including npm distribution for recorder and separate AWS Lambda routes for transcoder and reporter.
+The reusable [`firsthand-deploy`](./skills/firsthand-deploy/SKILL.md) skill asks for packaging choices and creates deployment-ready artifacts under `dist`; it never deploys or publishes.
 
 ## Intended workflow
 
@@ -28,7 +28,7 @@ The reusable [`firsthand-deploy`](./skills/firsthand-deploy/SKILL.md) skill guid
 2. The transcoder returns structured issue details without storing or publishing the evidence.
 3. The user reviews and edits the prepared report.
 4. After confirmation, the recorder sends the report and evidence to the reporter.
-5. The reporter stores the evidence and creates the GitHub issue through a GitHub App.
+5. The reporter stores the evidence and creates the GitHub issue using configured GitHub token or GitHub App credentials.
 6. The reporter synchronises approved developer responses and user replies through its API.
 
 ## Guiding principles

@@ -8,7 +8,7 @@ The transcoder includes local Whisper/ONNX and ffmpeg. Confirm whether the user 
 
 ## Reporter
 
-Do not deploy the current SQLite mapping as ordinary Lambda local storage: Lambda filesystems are ephemeral and concurrent invocations do not share a database. Ask the user to choose one before deploying:
+Do not package the current SQLite mapping as ordinary Lambda local storage: Lambda filesystems are ephemeral and concurrent invocations do not share a database. Ask the user to choose one before generating assets:
 
 - RDS/Aurora or another managed SQL database;
 - DynamoDB with an equivalent issue/comment mapping design; or
